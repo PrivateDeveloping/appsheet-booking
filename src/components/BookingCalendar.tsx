@@ -58,7 +58,8 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
   const isPastDate = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return date < today;
+    // Treat today as past to prevent same-day bookings
+    return date <= today;
   };
 
   const getDateStatus = (date: Date): 'available' | 'booked' | 'past' | 'unknown' => {
@@ -131,8 +132,6 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
             const dateStr = formatDate(date);
             const status = getDateStatus(date);
             const isSelected = selectedDate === dateStr;
-            const isToday = formatDate(new Date()) === dateStr;
-
             return (
               <button
                 key={dateStr}
@@ -158,8 +157,6 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
                   isSelected && [
                     "bg-primary text-primary-foreground scale-105 shadow-md",
                   ],
-                  // Today indicator
-                  isToday && !isSelected && "ring-2 ring-primary ring-offset-2 ring-offset-card",
                 )}
               >
                 {date.getDate()}
