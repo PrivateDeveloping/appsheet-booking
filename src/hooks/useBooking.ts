@@ -84,11 +84,134 @@
 //     bookDate,
 //   };
 // }
-import { useState, useCallback } from 'react';
-import { DateSlot, BookingRequest } from '@/types/booking';
+// import { useState, useCallback } from 'react';
+// import { DateSlot, BookingRequest } from '@/types/booking';
 
-// Your deployed Google Apps Script URL
-const API_URL = "https://script.google.com/macros/s/AKfycbxq5UaIc3LPR19euoCBkQi1sPD4jPjvf7GTWkTJ_pZaDixzmRSj4bk6d2idVHdAJHuYvg/exec";
+// // Your deployed Google Apps Script URL
+// // const API_URL = "https://script.google.com/macros/s/AKfycbxq5UaIc3LPR19euoCBkQi1sPD4jPjvf7GTWkTJ_pZaDixzmRSj4bk6d2idVHdAJHuYvg/exec";
+// const API_URL = "/api";
+
+// export function useBooking() {
+//   const [dates, setDates] = useState<DateSlot[]>([]);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+//   const [bookingInProgress, setBookingInProgress] = useState(false);
+
+//   const normalizeDate = useCallback((value: string): string => {
+//     if (!value) return value;
+//     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+
+//     const datePart = value.split('T')[0];
+//     if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
+
+//     const parsed = new Date(value);
+//     return isNaN(parsed.getTime()) ? value : parsed.toISOString().slice(0, 10);
+//   }, []);
+
+//   /**
+//    * JSONP GET request (bypasses CORS)
+//    */
+//   const fetchAvailability = useCallback(async () => {
+//     setLoading(true);
+//     setError(null);
+
+//     try {
+//       const callbackName = "jsonp_callback_" + Math.random().toString(36).substring(2);
+
+//       const jsonpPromise = new Promise<any>((resolve, reject) => {
+//         (window as any)[callbackName] = (data: any) => {
+//           resolve(data);
+//           delete (window as any)[callbackName];
+//         };
+
+//         const script = document.createElement("script");
+//         script.src = `${API_URL}?action=availability&callback=${callbackName}`;
+//         script.onerror = reject;
+//         document.body.appendChild(script);
+//       });
+
+//       const result = await jsonpPromise;
+
+//       if (result.success && result.data?.dates) {
+//         const normalizedDates = result.data.dates
+//           .map((slot: DateSlot) => ({
+//             ...slot,
+//             date: normalizeDate(slot.date)
+//           }))
+//           .filter((slot: DateSlot) => !!slot.date);
+
+//         setDates(normalizedDates);
+//       } else {
+//         throw new Error(result.error || "Failed to fetch dates");
+//       }
+
+//     } catch (err) {
+//       const message = err instanceof Error ? err.message : "Failed to fetch availability";
+//       setError(message);
+//       console.error("JSONP fetch error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [normalizeDate]);
+
+//   /**
+//    * POST booking using no-cors
+//    * NOTE: Cannot read JSON response due to no-cors limitations
+//    */
+//   const bookDate = useCallback(async (booking: BookingRequest) => {
+//     setBookingInProgress(true);
+//     setError(null);
+
+//     try {
+//       await fetch(API_URL, {
+//         method: "POST",
+//         mode: "no-cors",
+//         headers: {
+//           "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify({
+//           action: "book",
+//           ...booking
+//         })
+//       });
+
+//       // Since no-cors blocks the response, we manually update local state
+//       setDates(prev =>
+//         prev.map(d =>
+//           d.date === booking.date
+//             ? { ...d, status: "booked", bookedBy: booking.name }
+//             : d
+//         )
+//       );
+
+//       return { success: true };
+
+//     } catch (err) {
+//       const message = err instanceof Error ? err.message : "Failed to book date";
+//       setError(message);
+//       return { success: false, error: message };
+//     } finally {
+//       setBookingInProgress(false);
+//     }
+//   }, []);
+
+//   return {
+//     dates,
+//     loading,
+//     error,
+//     bookingInProgress,
+//     fetchAvailability,
+//     bookDate,
+//   };
+// }
+import { useState, useCallback } from "react";
+import {
+  DateSlot,
+  BookingRequest,
+  BookingResponse,
+  AvailabilityResponse,
+  ApiResponse
+} from "@/types/booking";
 
 export function useBooking() {
   const [dates, setDates] = useState<DateSlot[]>([]);
@@ -96,98 +219,80 @@ export function useBooking() {
   const [error, setError] = useState<string | null>(null);
   const [bookingInProgress, setBookingInProgress] = useState(false);
 
+  // Normalize date to YYYY-MM-DD
   const normalizeDate = useCallback((value: string): string => {
     if (!value) return value;
     if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-
-    const datePart = value.split('T')[0];
-    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return datePart;
-
-    const parsed = new Date(value);
-    return isNaN(parsed.getTime()) ? value : parsed.toISOString().slice(0, 10);
+    return value.split("T")[0];
   }, []);
 
   /**
-   * JSONP GET request (bypasses CORS)
+   * 🔹 GET availability from Vercel API
    */
   const fetchAvailability = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const callbackName = "jsonp_callback_" + Math.random().toString(36).substring(2);
+      const response = await fetch("/api/availability");
 
-      const jsonpPromise = new Promise<any>((resolve, reject) => {
-        (window as any)[callbackName] = (data: any) => {
-          resolve(data);
-          delete (window as any)[callbackName];
-        };
+      // ⭐ FIX: Proper typing
+      const result: ApiResponse<AvailabilityResponse> = await response.json();
 
-        const script = document.createElement("script");
-        script.src = `${API_URL}?action=availability&callback=${callbackName}`;
-        script.onerror = reject;
-        document.body.appendChild(script);
-      });
-
-      const result = await jsonpPromise;
-
-      if (result.success && result.data?.dates) {
-        const normalizedDates = result.data.dates
-          .map((slot: DateSlot) => ({
-            ...slot,
-            date: normalizeDate(slot.date)
-          }))
-          .filter((slot: DateSlot) => !!slot.date);
-
-        setDates(normalizedDates);
-      } else {
-        throw new Error(result.error || "Failed to fetch dates");
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Failed to load availability");
       }
 
+      const normalized = result.data.dates.map((slot: DateSlot) => ({
+        ...slot,
+        date: normalizeDate(slot.date)
+      }));
+
+      setDates(normalized);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch availability";
       setError(message);
-      console.error("JSONP fetch error:", err);
+      console.error("Availability error:", err);
     } finally {
       setLoading(false);
     }
   }, [normalizeDate]);
 
   /**
-   * POST booking using no-cors
-   * NOTE: Cannot read JSON response due to no-cors limitations
+   * 🔹 POST booking using Vercel API
    */
   const bookDate = useCallback(async (booking: BookingRequest) => {
     setBookingInProgress(true);
     setError(null);
 
     try {
-      await fetch(API_URL, {
+      const response = await fetch("/api/book", {
         method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          action: "book",
-          ...booking
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(booking),
       });
 
-      // Since no-cors blocks the response, we manually update local state
-      setDates(prev =>
-        prev.map(d =>
+      // ⭐ FIX: Proper typing
+      const result: ApiResponse<BookingResponse> = await response.json();
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Booking failed");
+      }
+
+      // Update UI optimistically
+      setDates((prev) =>
+        prev.map((d) =>
           d.date === booking.date
             ? { ...d, status: "booked", bookedBy: booking.name }
             : d
         )
       );
 
-      return { success: true };
-
+      return result;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to book date";
       setError(message);
+      console.error("Booking error:", err);
       return { success: false, error: message };
     } finally {
       setBookingInProgress(false);
