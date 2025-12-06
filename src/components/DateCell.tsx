@@ -37,6 +37,18 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
 
   const dayNumber = new Date(`${date}T12:00:00`).getDate();
 
+  const statusBase = isUnavailable
+    ? "bg-muted/70 border-border/70 text-muted-foreground"
+    : isFull
+      ? "bg-red-500/20 border-red-500/50 text-red-700"
+      : "bg-emerald-500/20 border-emerald-500/40 text-emerald-800";
+
+  const statusHover = isUnavailable
+    ? "hover:bg-muted/80"
+    : isFull
+      ? "hover:bg-red-500/25"
+      : "hover:bg-emerald-500/25";
+
   return (
     <button
       type="button"
@@ -44,26 +56,16 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(
-        "w-full h-full min-h-[48px] sm:min-h-[150px] rounded-xl sm:rounded-2xl border p-1 sm:p-4 text-left flex flex-col gap-2 sm:gap-3 transition-all duration-200 shadow-sm",
-        "bg-card border-border",
+        "w-full h-full min-h-[48px] sm:min-h-[150px] rounded-xl sm:rounded-2xl border p-2 sm:p-4 text-left flex flex-col gap-2 sm:gap-3 transition-all duration-200 shadow-sm",
+        statusBase,
+        !disabled && statusHover,
         !disabled && "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
-        isFull && !isUnavailable && "border-red-200 bg-red-50 text-red-700",
-        isUnavailable && "border-border/70 bg-muted/60 text-muted-foreground",
         disabled && "cursor-not-allowed opacity-80"
       )}
     >
-      {/* Mobile simplified pill */}
+      {/* Mobile simplified tile */}
       <div className="sm:hidden flex items-center justify-center w-full h-full">
-        <div
-          className={cn(
-            "w-10 h-10 flex items-center justify-center rounded-none text-sm font-semibold border",
-            isUnavailable && "bg-muted text-muted-foreground border-border/70",
-            isFull && "bg-red-500 text-white border-red-500",
-            !isFull && !isUnavailable && "bg-primary text-primary-foreground border-primary"
-          )}
-        >
-          {dayNumber}
-        </div>
+        <span className="text-base font-semibold leading-none">{dayNumber}</span>
       </div>
 
       {/* Desktop/tablet detailed layout */}
