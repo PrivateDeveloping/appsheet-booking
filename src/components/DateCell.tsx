@@ -57,9 +57,9 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
         <div
           className={cn(
             "w-10 h-10 flex items-center justify-center rounded-none text-sm font-semibold border",
-            isUnavailable && "bg-muted/20 text-muted-foreground border-border/70",
-            isFull && "bg-red-500/15 text-red-600 border-red-500/40",
-            !isFull && !isUnavailable && "bg-primary/15 text-primary border-primary/30"
+            isUnavailable && "bg-muted text-muted-foreground border-border/70",
+            isFull && "bg-red-500 text-white border-red-500",
+            !isFull && !isUnavailable && "bg-primary text-primary-foreground border-primary"
           )}
         >
           {dayNumber}

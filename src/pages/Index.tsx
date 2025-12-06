@@ -111,6 +111,7 @@ const Index = () => {
           <div className="lg:col-span-1">
             <BookingForm
               selectedDate={selectedDate}
+              selectedSlot={dates.find((d) => d.date === selectedDate) || null}
               onSubmit={handleBooking}
               loading={bookingInProgress}
             />

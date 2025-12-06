@@ -3,16 +3,17 @@ import { User, Mail, Calendar, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BookingRequest } from '@/types/booking';
+import { BookingRequest, DateSlot } from '@/types/booking';
 import { cn } from '@/lib/utils';
 
 interface BookingFormProps {
   selectedDate: string | null;
+  selectedSlot?: DateSlot | null;
   onSubmit: (booking: BookingRequest) => Promise<{ success: boolean; error?: string; message?: string }>;
   loading: boolean;
 }
 
-export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProps) {
+export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: BookingFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
@@ -65,6 +66,15 @@ export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProp
     setError(null);
   };
 
+  const availabilityInfo = (() => {
+    if (!selectedSlot) return null;
+    if (selectedSlot.full || selectedSlot.remaining <= 0) {
+      return { label: "Fully booked", tone: "destructive" as const };
+    }
+    const clamped = Math.max(0, Math.min(selectedSlot.remaining, 5));
+    return { label: `${clamped} of 5 slots left`, tone: "success" as const };
+  })();
+
   if (!selectedDate) {
     return (
       <div id="booking-form" className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
@@ -107,6 +117,17 @@ export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProp
         <p className="text-sm text-muted-foreground">
           {formatDisplayDate(selectedDate)}
         </p>
+        {availabilityInfo && (
+          <div
+            className={cn(
+              "mt-3 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold",
+              availabilityInfo.tone === "destructive" && "bg-red-50 text-red-700 border border-red-200",
+              availabilityInfo.tone === "success" && "bg-emerald-50 text-emerald-700 border border-emerald-200"
+            )}
+          >
+            {availabilityInfo.label}
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
