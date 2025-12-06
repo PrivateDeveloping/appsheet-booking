@@ -1,8 +1,10 @@
 export interface DateSlot {
-  date: string; // YYYY-MM-DD
-  remaining: number; // how many slots left (0-5)
-  full: boolean; // convenience flag for UI
+  date: string;
+  booked: number;     // 👈 add this
+  remaining: number;
+  full: boolean;
 }
+
 
 export interface BookingRequest {
   date: string;
