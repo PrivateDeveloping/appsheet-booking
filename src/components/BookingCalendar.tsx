@@ -102,12 +102,12 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
   return (
     <div className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 bg-accent rounded-lg">
             <Calendar className="w-5 h-5 text-accent-foreground" />
           </div>
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-xl font-semibold text-foreground truncate">
             {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </h2>
         </div>
@@ -130,19 +130,27 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
 
       {/* Calendar grid */}
       {!loading && (
-        <div className="-mx-3 sm:mx-0 overflow-x-auto pb-2">
-          <div className="min-w-[520px] sm:min-w-full grid grid-cols-7 gap-2 sm:gap-3">
-            {/* Day headers */}
+        <div className="space-y-2">
+          {/* Day headers (shown on larger screens to preserve alignment) */}
+          <div className="hidden lg:grid grid-cols-7 gap-3 text-center py-2 text-sm font-medium text-muted-foreground">
             {DAYS.map(day => (
-              <div key={day} className="text-center py-2 text-xs sm:text-sm font-medium text-muted-foreground">
+              <div key={day} className="px-1">
                 {day}
               </div>
             ))}
+          </div>
 
-            {/* Calendar days */}
+          {/* Calendar days */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 auto-rows-fr">
             {calendarDays.map((date, index) => {
               if (!date) {
-                return <div key={`empty-${index}`} className="aspect-square" />;
+                return (
+                  <div
+                    key={`empty-${index}`}
+                    className="hidden lg:block"
+                    aria-hidden
+                  />
+                );
               }
 
               const dateStr = formatDate(date);
@@ -152,7 +160,7 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
                 <div
                   key={dateStr}
                   className={cn(
-                    "aspect-square p-1",
+                    "h-full min-w-0",
                     isSelected && "ring-2 ring-primary rounded-xl"
                   )}
                 >
@@ -169,8 +177,8 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-border">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 pt-4 border-t border-border">
+        <div className="flex items-center gap-2 min-w-[140px]">
           <div className="flex gap-0.5">
             {[0, 1, 2].map((i) => (
               <div key={i} className="w-3 h-1.5 rounded-sm bg-[#4ade80]" />

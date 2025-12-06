@@ -32,7 +32,7 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
       onClick={handleClick}
       disabled={disabled}
       className={cn(
-        "w-full h-full rounded-xl border p-2.5 sm:p-4 text-left flex flex-col gap-1.5 sm:gap-2 transition-all duration-200 shadow-sm",
+        "w-full h-full min-h-[150px] rounded-2xl border p-3 md:p-4 text-left flex flex-col gap-3 transition-all duration-200 shadow-sm",
         "bg-card border-border",
         !disabled && "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         isFull && !isUnavailable && "border-red-200 bg-red-50 text-red-700",
@@ -40,11 +40,11 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
         disabled && "cursor-not-allowed opacity-80"
       )}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-base sm:text-lg font-semibold leading-none">{dayNumber}</span>
+      <div className="flex items-start justify-between gap-2 min-w-0">
+        <span className="text-lg font-semibold leading-none">{dayNumber}</span>
         <span
           className={cn(
-            "text-[11px] sm:text-xs font-semibold px-2 py-1 rounded-full",
+            "text-[11px] font-semibold px-2 py-1 rounded-full whitespace-nowrap leading-tight",
             isFull
               ? "bg-red-100 text-red-700"
               : isUnavailable
@@ -56,14 +56,14 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
         </span>
       </div>
 
-      <div className="flex gap-1" aria-label={`${booked} of 5 slots booked`}>
+      <div className="grid grid-cols-5 gap-1 w-full" aria-label={`${booked} of 5 slots booked`}>
         {Array.from({ length: 5 }).map((_, idx) => {
           const filled = idx < booked;
           return (
             <div
               key={idx}
               className={cn(
-                "h-2 sm:h-2.5 flex-1 rounded-md transition-colors",
+                "h-2 rounded-full transition-colors",
                 filled ? "bg-[#4ade80]" : "bg-[#e5e7eb]"
               )}
             />
@@ -73,7 +73,7 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
 
       <p
         className={cn(
-          "text-[11px] sm:text-xs font-medium leading-tight",
+          "text-xs font-medium leading-snug break-words",
           isFull ? "text-red-700" : "text-muted-foreground"
         )}
       >
