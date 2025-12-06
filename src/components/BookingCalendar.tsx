@@ -97,6 +97,12 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
   const handleDateClick = (dateStr: string, selectable: boolean) => {
     if (!selectable) return;
     onDateSelect(dateStr);
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      const formSection = document.getElementById('booking-form');
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   };
 
   return (

@@ -67,7 +67,7 @@ export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProp
 
   if (!selectedDate) {
     return (
-      <div className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
+      <div id="booking-form" className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-8 h-8 text-muted-foreground" />
@@ -83,7 +83,7 @@ export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProp
 
   if (success) {
     return (
-      <div className="bg-card rounded-xl shadow-card p-6 animate-scale-in">
+      <div id="booking-form" className="bg-card rounded-xl shadow-card p-6 animate-scale-in">
         <div className="text-center py-8">
           <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-success" />
@@ -101,7 +101,7 @@ export function BookingForm({ selectedDate, onSubmit, loading }: BookingFormProp
   }
 
   return (
-    <div className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
+    <div id="booking-form" className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-foreground mb-1">Book Appointment</h3>
         <p className="text-sm text-muted-foreground">

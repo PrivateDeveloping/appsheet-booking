@@ -13,7 +13,13 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
   const isFull = normalizedRemaining <= 0;
   const disabled = isFull || isUnavailable;
 
-  const label = isUnavailable
+  const mobileLabel = isUnavailable
+    ? "Unavailable"
+    : isFull
+      ? "Full"
+      : "Available";
+
+  const desktopLabel = isUnavailable
     ? "Unavailable"
     : isFull
       ? "Full"
@@ -32,7 +38,7 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
       onClick={handleClick}
       disabled={disabled}
       className={cn(
-        "w-full h-full min-h-[150px] rounded-2xl border p-3 md:p-4 text-left flex flex-col gap-3 transition-all duration-200 shadow-sm",
+        "w-full h-full min-h-[120px] sm:min-h-[150px] rounded-2xl border p-3 md:p-4 text-left flex flex-col gap-3 transition-all duration-200 shadow-sm",
         "bg-card border-border",
         !disabled && "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
         isFull && !isUnavailable && "border-red-200 bg-red-50 text-red-700",
@@ -52,11 +58,11 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
                 : "bg-emerald-50 text-emerald-700"
           )}
         >
-          {isFull ? "Full" : isUnavailable ? "N/A" : `${normalizedRemaining} left`}
+          {mobileLabel}
         </span>
       </div>
 
-      <div className="grid grid-cols-5 gap-1 w-full" aria-label={`${booked} of 5 slots booked`}>
+      <div className="hidden sm:grid grid-cols-5 gap-1 w-full" aria-label={`${booked} of 5 slots booked`}>
         {Array.from({ length: 5 }).map((_, idx) => {
           const filled = idx < booked;
           return (
@@ -73,11 +79,11 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
 
       <p
         className={cn(
-          "text-xs font-medium leading-snug break-words",
+          "hidden sm:block text-xs font-medium leading-snug break-words",
           isFull ? "text-red-700" : "text-muted-foreground"
         )}
       >
-        {label}
+        {desktopLabel}
       </p>
     </button>
   );
