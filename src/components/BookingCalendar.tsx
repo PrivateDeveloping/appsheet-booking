@@ -137,8 +137,8 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
       {/* Calendar grid */}
       {!loading && (
         <div className="space-y-2">
-          {/* Day headers (shown on larger screens to preserve alignment) */}
-          <div className="hidden lg:grid grid-cols-7 gap-3 text-center py-2 text-sm font-medium text-muted-foreground">
+          {/* Day headers */}
+          <div className="grid grid-cols-7 gap-2 sm:gap-3 text-center py-2 text-xs sm:text-sm font-medium text-muted-foreground">
             {DAYS.map(day => (
               <div key={day} className="px-1">
                 {day}
@@ -147,13 +147,13 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
           </div>
 
           {/* Calendar days */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 auto-rows-fr">
+          <div className="grid grid-cols-7 gap-2 sm:gap-3 auto-rows-fr">
             {calendarDays.map((date, index) => {
               if (!date) {
                 return (
                   <div
                     key={`empty-${index}`}
-                    className="hidden lg:block"
+                    className="h-full"
                     aria-hidden
                   />
                 );
