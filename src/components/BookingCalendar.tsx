@@ -130,39 +130,41 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
 
       {/* Calendar grid */}
       {!loading && (
-        <div className="grid grid-cols-7 gap-1">
-          {/* Day headers */}
-          {DAYS.map(day => (
-            <div key={day} className="text-center py-2 text-sm font-medium text-muted-foreground">
-              {day}
-            </div>
-          ))}
-
-          {/* Calendar days */}
-          {calendarDays.map((date, index) => {
-            if (!date) {
-              return <div key={`empty-${index}`} className="aspect-square" />;
-            }
-
-            const dateStr = formatDate(date);
-            const { remaining, selectable } = getDateDetails(date);
-            const isSelected = selectedDate === dateStr;
-            return (
-              <div
-                key={dateStr}
-                className={cn(
-                  "aspect-square p-1",
-                  isSelected && "ring-2 ring-primary rounded-xl"
-                )}
-              >
-                <DateCell
-                  date={dateStr}
-                  remaining={remaining}
-                  onSelect={(value) => handleDateClick(value, selectable)}
-                />
+        <div className="-mx-3 sm:mx-0 overflow-x-auto pb-2">
+          <div className="min-w-[520px] sm:min-w-full grid grid-cols-7 gap-2 sm:gap-3">
+            {/* Day headers */}
+            {DAYS.map(day => (
+              <div key={day} className="text-center py-2 text-xs sm:text-sm font-medium text-muted-foreground">
+                {day}
               </div>
-            );
-          })}
+            ))}
+
+            {/* Calendar days */}
+            {calendarDays.map((date, index) => {
+              if (!date) {
+                return <div key={`empty-${index}`} className="aspect-square" />;
+              }
+
+              const dateStr = formatDate(date);
+              const { remaining, selectable } = getDateDetails(date);
+              const isSelected = selectedDate === dateStr;
+              return (
+                <div
+                  key={dateStr}
+                  className={cn(
+                    "aspect-square p-1",
+                    isSelected && "ring-2 ring-primary rounded-xl"
+                  )}
+                >
+                  <DateCell
+                    date={dateStr}
+                    remaining={remaining}
+                    onSelect={(value) => handleDateClick(value, selectable)}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
