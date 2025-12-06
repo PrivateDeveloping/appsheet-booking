@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DateCell } from '@/components/DateCell';
 import { DateSlot } from '@/types/booking';
 import { cn } from '@/lib/utils';
 
@@ -62,11 +63,27 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
     return date <= today;
   };
 
-  const getDateStatus = (date: Date): 'available' | 'booked' | 'past' | 'unknown' => {
-    if (isPastDate(date)) return 'past';
+  const getDateDetails = (date: Date) => {
     const dateStr = formatDate(date);
     const slot = datesMap.get(dateStr);
-    return slot?.status || 'unknown';
+    const isPast = isPastDate(date);
+
+    if (!slot) {
+      return { dateStr, remaining: -1, selectable: false };
+    }
+
+    const clampedRemaining = Math.max(0, Math.min(slot.remaining, 5));
+    const isFull = slot.full || clampedRemaining <= 0;
+
+    if (isPast) {
+      return { dateStr, remaining: -1, selectable: false };
+    }
+
+    return {
+      dateStr,
+      remaining: isFull ? 0 : clampedRemaining,
+      selectable: !isFull
+    };
   };
 
   const handlePrevMonth = () => {
@@ -77,11 +94,9 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
-  const handleDateClick = (date: Date) => {
-    const status = getDateStatus(date);
-    if (status === 'available') {
-      onDateSelect(formatDate(date));
-    }
+  const handleDateClick = (dateStr: string, selectable: boolean) => {
+    if (!selectable) return;
+    onDateSelect(dateStr);
   };
 
   return (
@@ -130,37 +145,22 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
             }
 
             const dateStr = formatDate(date);
-            const status = getDateStatus(date);
+            const { remaining, selectable } = getDateDetails(date);
             const isSelected = selectedDate === dateStr;
             return (
-              <button
+              <div
                 key={dateStr}
-                onClick={() => handleDateClick(date)}
-                disabled={status !== 'available'}
                 className={cn(
-                  "aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all duration-200 relative",
-                  // Base states
-                  status === 'available' && !isSelected && [
-                    "bg-accent text-accent-foreground hover:bg-date-available hover:text-primary-foreground",
-                    "cursor-pointer hover:scale-105"
-                  ],
-                  status === 'booked' && [
-                    "bg-date-booked-bg text-date-booked cursor-not-allowed",
-                  ],
-                  status === 'past' && [
-                    "text-date-past cursor-not-allowed",
-                  ],
-                  status === 'unknown' && [
-                    "text-muted-foreground cursor-not-allowed opacity-50",
-                  ],
-                  // Selected state
-                  isSelected && [
-                    "bg-primary text-primary-foreground scale-105 shadow-md",
-                  ],
+                  "aspect-square p-1",
+                  isSelected && "ring-2 ring-primary rounded-xl"
                 )}
               >
-                {date.getDate()}
-              </button>
+                <DateCell
+                  date={dateStr}
+                  remaining={remaining}
+                  onSelect={(value) => handleDateClick(value, selectable)}
+                />
+              </div>
             );
           })}
         </div>
@@ -169,16 +169,23 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
       {/* Legend */}
       <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-border">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-accent" />
+          <div className="flex gap-0.5">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-3 h-1.5 rounded-sm bg-[#4ade80]" />
+            ))}
+            {[3, 4].map((i) => (
+              <div key={i} className="w-3 h-1.5 rounded-sm bg-[#e5e7eb]" />
+            ))}
+          </div>
           <span className="text-xs text-muted-foreground">Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-date-booked-bg" />
-          <span className="text-xs text-muted-foreground">Booked</span>
+          <div className="w-3 h-3 rounded-sm bg-red-200 border border-red-300" />
+          <span className="text-xs text-muted-foreground">Full</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm bg-muted" />
-          <span className="text-xs text-muted-foreground">Past</span>
+          <span className="text-xs text-muted-foreground">Unavailable</span>
         </div>
       </div>
     </div>
