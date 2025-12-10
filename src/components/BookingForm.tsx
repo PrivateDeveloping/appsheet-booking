@@ -180,7 +180,7 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
               onChange={setPhone}
               countrySelectComponent={CountrySelect}
               countrySelectProps={{
-                className: "min-w-[170px]"
+                className: "w-[80px]"
               }}
               className="flex w-full items-center gap-2 rounded-lg border border-input bg-background pl-10 pr-3 py-2 focus-within:ring-2 focus-within:ring-primary/60 focus-within:border-primary/60"
               inputClassName="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"

@@ -19,6 +19,7 @@ type CountrySelectProps = {
   disabled?: boolean;
   readOnly?: boolean;
   className?: string;
+  buttonClassName?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'value' | 'disabled'>;
 
 const isSameOption = (a?: Country | 'ZZ', b?: Country) => {
@@ -53,6 +54,7 @@ export function CountrySelect({
   disabled,
   readOnly,
   className,
+  buttonClassName,
   onFocus,
   onBlur,
   ...buttonProps
@@ -189,16 +191,19 @@ export function CountrySelect({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full min-w-[160px]">
+    <div
+      ref={containerRef}
+      className={cn('relative inline-flex w-[78px] min-w-[72px]', className)}
+    >
       <button
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listboxId}
         className={cn(
-          'flex w-full items-center justify-between gap-3 rounded-md border border-input bg-background px-3 py-2 text-left text-sm text-foreground shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:cursor-not-allowed disabled:opacity-60',
+          'flex w-full items-center justify-between gap-1 rounded-lg border border-input bg-card px-2.5 py-1.5 text-left text-sm text-foreground shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:cursor-not-allowed disabled:opacity-60',
           open && 'ring-2 ring-primary/60',
-          className
+          buttonClassName
         )}
         disabled={isDisabled}
         onClick={() => !isDisabled && setOpen((prev) => !prev)}
@@ -209,18 +214,13 @@ export function CountrySelect({
       >
         <span className="flex min-w-0 items-center gap-2">
           <span className="text-lg leading-none">{selectedFlag}</span>
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate">{selectedOption.label}</span>
-            {selectedCode && (
-              <span className="text-xs text-muted-foreground">{selectedCode}</span>
-            )}
-          </span>
+          <span className="text-sm font-medium text-foreground">{selectedCode || ''}</span>
         </span>
         <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden />
       </button>
 
       {open && (
-        <div className="absolute left-0 right-0 z-30 mt-2 max-h-72 overflow-hidden rounded-lg border border-border bg-popover shadow-lg shadow-primary/10">
+        <div className="absolute left-0 z-30 mt-1 w-64 max-h-72 overflow-hidden rounded-lg border border-border bg-card text-sm shadow-lg shadow-primary/10">
           <ul
             id={listboxId}
             ref={listRef}
@@ -250,11 +250,9 @@ export function CountrySelect({
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >
                   <span className="text-lg leading-none">{flag}</span>
-                  <span className="flex min-w-0 flex-col">
+                  <span className="flex min-w-0 items-center gap-2">
+                    {code && <span className="text-xs font-medium text-muted-foreground">{code}</span>}
                     <span className="truncate">{option.label}</span>
-                    {code && (
-                      <span className="text-xs text-muted-foreground">{code}</span>
-                    )}
                   </span>
                 </li>
               );
