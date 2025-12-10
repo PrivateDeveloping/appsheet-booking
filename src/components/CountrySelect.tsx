@@ -63,6 +63,10 @@ export function CountrySelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [open, setOpen] = useState(false);
+  const typeaheadRef = useRef<{ query: string; timeoutId?: number }>({
+    query: '',
+    timeoutId: undefined,
+  });
   const optionList = useMemo(
     () => options.filter((option) => !option.divider),
     [options]
@@ -112,6 +116,13 @@ export function CountrySelect({
     };
   }, [open]);
 
+  const scrollToIndex = (index: number) => {
+    const highlighted = listRef.current?.querySelector<HTMLElement>(
+      `[data-index="${index}"]`
+    );
+    highlighted?.scrollIntoView({ block: 'nearest' });
+  };
+
   const moveHighlight = (delta: number) => {
     setHighlightedIndex((current) => {
       if (!optionList.length) return current;
@@ -134,6 +145,45 @@ export function CountrySelect({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (isDisabled) return;
+
+    const isCharacterKey = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+
+    if (isCharacterKey) {
+      const char = event.key.toLowerCase();
+      const current = typeaheadRef.current;
+      current.query = (current.query + char).trim();
+      if (current.timeoutId) {
+        window.clearTimeout(current.timeoutId);
+      }
+      current.timeoutId = window.setTimeout(() => {
+        current.query = '';
+      }, 700);
+
+      const startIndex = highlightedIndex >= 0 ? highlightedIndex + 1 : 0;
+      const findMatch = (from: number) => {
+        for (let i = 0; i < optionList.length; i += 1) {
+          const idx = (from + i) % optionList.length;
+          const option = optionList[idx];
+          const label = option.label.toLowerCase();
+          const code = getCallingCode(option.value).replace('+', '').toLowerCase();
+          if (label.startsWith(current.query) || code.startsWith(current.query)) {
+            return idx;
+          }
+        }
+        return -1;
+      };
+
+      const matchIndex = findMatch(startIndex);
+      if (!open) {
+        setOpen(true);
+      }
+      if (matchIndex >= 0) {
+        setHighlightedIndex(matchIndex);
+        scrollToIndex(matchIndex);
+      }
+      return;
+    }
+
     if (!open) {
       if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
         event.preventDefault();
@@ -154,10 +204,12 @@ export function CountrySelect({
       case 'Home':
         event.preventDefault();
         setHighlightedIndex(0);
+        scrollToIndex(0);
         break;
       case 'End':
         event.preventDefault();
         setHighlightedIndex(optionList.length - 1);
+        scrollToIndex(optionList.length - 1);
         break;
       case 'Enter':
       case ' ':
