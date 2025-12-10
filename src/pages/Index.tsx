@@ -30,7 +30,8 @@ const Index = () => {
         title: "Booking Confirmed!",
         description: `Your appointment for ${booking.date} has been booked.`,
       });
-      setSelectedDate(null);
+      // Keep the same date selected so the user can book another on that day
+      setSelectedDate(booking.date);
     } else {
       toast({
         title: "Booking Failed",
