@@ -65,6 +65,43 @@
 //   return res.status(200).json(result);
 // }
 
+// import type { VercelRequest, VercelResponse } from "@vercel/node";
+
+// export default async function handler(req: VercelRequest, res: VercelResponse) {
+//   if (req.method !== "POST") {
+//     return res.status(405).json({ success: false, error: "Method not allowed" });
+//   }
+
+//   const { date, name, email } = req.body;
+
+//   if (!date || !name || !email) {
+//     return res.status(400).json({ success: false, error: "Missing fields" });
+//   }
+
+//   const response = await fetch(process.env.SCRIPT_URL!, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       action: "book",
+//       date,
+//       name,
+//       email,
+//       secret: process.env.API_SECRET
+//     }),
+//   });
+
+//   const result = await response.json().catch(() => null);
+
+//   if (!result || !result.success) {
+//     return res.status(500).json({
+//       success: false,
+//       error: result?.error || "Failed to book date",
+//     });
+//   }
+
+//   return res.status(200).json(result);
+// }
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -72,10 +109,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  const { date, name, email } = req.body;
+  const { date, name, phone, email } = req.body;
 
-  if (!date || !name || !email) {
-    return res.status(400).json({ success: false, error: "Missing fields" });
+  // ➜ phone is required, email is optional
+  if (!date || !name || !phone) {
+    return res.status(400).json({ success: false, error: "Missing required fields" });
   }
 
   const response = await fetch(process.env.SCRIPT_URL!, {
@@ -85,8 +123,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       action: "book",
       date,
       name,
-      email,
-      secret: process.env.API_SECRET
+      phone,
+      email: email || "",
+      secret: process.env.API_SECRET,
     }),
   });
 

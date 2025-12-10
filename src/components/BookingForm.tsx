@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Calendar, Loader2, CheckCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ interface BookingFormProps {
 
 export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: BookingFormProps) {
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,27 +35,31 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
     setError(null);
     setSuccess(false);
 
-    if (!selectedDate || !name.trim() || !email.trim()) {
-      setError('Please fill in all fields');
+    if (!selectedDate || !name.trim() || !phone.trim()) {
+      setError('Please enter your name and phone number');
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
-      return;
+    // Basic email validation (optional)
+    if (email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.trim())) {
+        setError('Please enter a valid email address');
+        return;
+      }
     }
 
     const result = await onSubmit({
       date: selectedDate,
       name: name.trim(),
-      email: email.trim(),
+      phone: phone.trim(),
+      email: email.trim() || null,
     });
 
     if (result.success) {
       setSuccess(true);
       setName('');
+      setPhone('');
       setEmail('');
     } else {
       setError(result.error || 'Booking failed');
@@ -143,6 +148,24 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
               placeholder="John Doe"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className="pl-10"
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone" className="text-sm font-medium">
+            Phone Number
+          </Label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="pl-10"
               disabled={loading}
             />

@@ -58,48 +58,105 @@ function getAvailability() {
   return jsonResponse({ success: true, data: { dates } });
 }
 
-function bookDate(data) {
-  const { date, name, email } = data;
+// function bookDate(data) {
+//   const { date, name, email } = data;
 
-  if (!date || !name || !email) {
-    return { success: false, error: "Missing fields" };
+//   if (!date || !name || !email) {
+//     return { success: false, error: "Missing fields" };
+//   }
+
+//   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+//   const rows = sheet.getDataRange().getValues();
+
+//   let rowIndex = -1;
+
+//   for (let i = 1; i < rows.length; i++) {
+//     const sheetDate = Utilities.formatDate(rows[i][0], Session.getScriptTimeZone(), "yyyy-MM-dd");
+
+//     if (sheetDate === date) {
+//       rowIndex = i + 1;
+
+//       if (rows[i][1] === "booked") {
+//         return { success: false, error: "This date is already booked" };
+//       }
+
+//       break;
+//     }
+//   }
+
+//   if (rowIndex === -1) {
+//     return { success: false, error: "Date not found" };
+//   }
+
+//   const timestamp = new Date().toISOString();
+
+//   sheet.getRange(rowIndex, 2).setValue("booked");
+//   sheet.getRange(rowIndex, 3).setValue(name);
+//   sheet.getRange(rowIndex, 4).setValue(email);
+//   sheet.getRange(rowIndex, 5).setValue(timestamp);
+
+//   return {
+//     success: true,
+//     booking: { date, status: "booked", bookedBy: name }
+//   };
+// }
+function bookDate(data) {
+  const { date, name, phone, email } = data;
+
+  // ➜ Phone is now required, email is optional
+  if (!date || !name || !phone) {
+    return { success: false, error: "Missing required fields (date, name, phone)" };
   }
 
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("Bookings");
   const rows = sheet.getDataRange().getValues();
 
-  let rowIndex = -1;
+  let firstEmptyRow: number | null = null;
+  let bookedCount = 0;
 
   for (let i = 1; i < rows.length; i++) {
-    const sheetDate = Utilities.formatDate(rows[i][0], Session.getScriptTimeZone(), "yyyy-MM-dd");
+    const [rowDate, slot, rowName] = rows[i];
 
-    if (sheetDate === date) {
-      rowIndex = i + 1;
+    if (rowDate === date) {
+      const isBooked = rowName && rowName.toString().trim().length > 0;
 
-      if (rows[i][1] === "booked") {
-        return { success: false, error: "This date is already booked" };
+      if (isBooked) {
+        bookedCount++;
+      } else if (!firstEmptyRow) {
+        firstEmptyRow = i + 1; // Sheet is 1-indexed
       }
-
-      break;
     }
   }
 
-  if (rowIndex === -1) {
-    return { success: false, error: "Date not found" };
+  if (bookedCount >= 5) {
+    return { success: false, error: "This date is fully booked" };
+  }
+
+  if (!firstEmptyRow) {
+    return { success: false, error: "No empty slot found for this date" };
   }
 
   const timestamp = new Date().toISOString();
 
-  sheet.getRange(rowIndex, 2).setValue("booked");
-  sheet.getRange(rowIndex, 3).setValue(name);
-  sheet.getRange(rowIndex, 4).setValue(email);
-  sheet.getRange(rowIndex, 5).setValue(timestamp);
+  // Columns: Date | Slot | Name | Phone | Email | BookedAt
+  sheet.getRange(firstEmptyRow, 3).setValue(name);
+  sheet.getRange(firstEmptyRow, 4).setValue(phone);
+  sheet.getRange(firstEmptyRow, 5).setValue(email || "");
+  sheet.getRange(firstEmptyRow, 6).setValue(timestamp);
 
   return {
     success: true,
-    booking: { date, status: "booked", bookedBy: name }
+    booking: {
+      date,
+      slot: bookedCount + 1,
+      name,
+      phone,
+      email: email || null,
+    }
   };
 }
+
 
 function jsonResponse(obj) {
   return ContentService

@@ -6,6 +6,7 @@ import { SetupGuide } from '@/components/SetupGuide';
 import { Button } from '@/components/ui/button';
 import { useBooking } from '@/hooks/useBooking';
 import { useToast } from '@/hooks/use-toast';
+import { BookingRequest } from '@/types/booking';
 
 const Index = () => {
   const { dates, loading, error, bookingInProgress, fetchAvailability, bookDate } = useBooking();
@@ -21,7 +22,7 @@ const Index = () => {
     }
   }, [fetchAvailability]);
 
-  const handleBooking = async (booking: { date: string; name: string; email: string }) => {
+  const handleBooking = async (booking: BookingRequest) => {
     const result = await bookDate(booking);
     
     if (result.success) {
