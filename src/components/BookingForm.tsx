@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { User, Mail, Phone, Calendar, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +17,7 @@ interface BookingFormProps {
 
 export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: BookingFormProps) {
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState<string | undefined>();
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +37,13 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
     setError(null);
     setSuccess(false);
 
-    if (!selectedDate || !name.trim() || !phone.trim()) {
+    if (!selectedDate || !name.trim() || !phone) {
       setError('Please enter your name and phone number');
+      return;
+    }
+
+    if (!isValidPhoneNumber(phone)) {
+      setError('Please enter a valid phone number');
       return;
     }
 
@@ -52,14 +59,14 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
     const result = await onSubmit({
       date: selectedDate,
       name: name.trim(),
-      phone: phone.trim(),
+      phone,
       email: email.trim() || null,
     });
 
     if (result.success) {
       setSuccess(true);
       setName('');
-      setPhone('');
+      setPhone(undefined);
       setEmail('');
     } else {
       setError(result.error || 'Booking failed');
@@ -160,13 +167,16 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
           </Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+1 (555) 123-4567"
+            <PhoneInput
+              international
+              defaultCountry="CH"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="pl-10"
+              onChange={setPhone}
+              countrySelectProps={{
+                className: "rounded-md border border-input bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+              }}
+              className="flex w-full items-center gap-2 rounded-lg border border-input bg-background pl-10 pr-3 py-2 focus-within:ring-2 focus-within:ring-primary/60 focus-within:border-primary/60"
+              inputClassName="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"
               disabled={loading}
             />
           </div>
