@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import { User, Mail, Phone, Calendar, Loader2, CheckCircle } from 'lucide-react';
@@ -21,6 +21,11 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
   const [email, setEmail] = useState('');
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    // Reset success/error when selecting a new date
+    setSuccess(false);
+    setError(null);
+  }, [selectedDate]);
 
   const formatDisplayDate = (dateStr: string): string => {
     const date = new Date(dateStr + 'T12:00:00');
