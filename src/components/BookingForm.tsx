@@ -179,9 +179,9 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
               onChange={setPhone}
               countrySelectProps={{
                 className:
-                  "flex h-10 min-w-[92px] items-center rounded-md border border-input bg-background px-3 text-sm font-semibold text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  "PhoneInputCountrySelect flex h-10 min-w-[110px] items-center rounded-md border border-input bg-background px-3 pr-8 text-sm font-semibold text-foreground shadow-sm ring-offset-background transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 appearance-none"
               }}
-              className="flex w-full items-center gap-2 rounded-md border border-input bg-background pl-10 pr-3 text-base ring-offset-background transition focus-within:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm"
+              className="flex w-full items-center gap-2 rounded-md border border-input bg-background pl-10 pr-3 text-base shadow-sm ring-offset-background transition focus-within:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 md:text-sm"
               inputClassName="flex-1 h-10 border-0 bg-transparent p-0 text-base text-foreground placeholder:text-muted-foreground focus:outline-none md:text-sm"
               disabled={loading}
             />
