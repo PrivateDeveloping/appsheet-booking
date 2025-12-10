@@ -1,6 +1,6 @@
 export interface DateSlot {
   date: string;
-  booked: number;     // 👈 add this
+  booked: number;
   remaining: number;
   full: boolean;
 }

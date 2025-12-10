@@ -106,14 +106,14 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-card p-6 animate-fade-in">
+    <div className="bg-card rounded-xl shadow-card p-4 sm:p-5 animate-fade-in max-w-xl mx-auto w-full">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 bg-accent rounded-lg">
             <Calendar className="w-5 h-5 text-accent-foreground" />
           </div>
-          <h2 className="text-xl font-semibold text-foreground truncate">
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground truncate">
             {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </h2>
         </div>
@@ -129,7 +129,7 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
 
       {/* Loading state */}
       {loading && (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-8">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       )}
@@ -138,7 +138,7 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
       {!loading && (
         <div className="space-y-2">
           {/* Day headers */}
-          <div className="grid grid-cols-7 gap-2 sm:gap-3 text-center py-2 text-xs sm:text-sm font-medium text-muted-foreground">
+          <div className="grid grid-cols-7 gap-2 text-center py-1 text-xs font-medium text-muted-foreground">
             {DAYS.map(day => (
               <div key={day} className="px-1">
                 {day}
@@ -147,7 +147,7 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
           </div>
 
           {/* Calendar days */}
-          <div className="grid grid-cols-7 gap-2 sm:gap-3 auto-rows-fr">
+          <div className="grid grid-cols-7 gap-2 auto-rows-[minmax(48px,1fr)]">
             {calendarDays.map((date, index) => {
               if (!date) {
                 return (
@@ -183,7 +183,7 @@ export function BookingCalendar({ dates, loading, onDateSelect, selectedDate }: 
       )}
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 pt-4 border-t border-border">
+      <div className="flex flex-wrap items-center justify-center gap-4 mt-4 pt-3 border-t border-border text-xs">
         <div className="flex items-center gap-2 min-w-[140px]">
           <div className="flex gap-0.5">
             {[0, 1, 2].map((i) => (

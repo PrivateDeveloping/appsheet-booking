@@ -44,7 +44,7 @@ export function DateCell({ date, remaining, onSelect }: DateCellProps) {
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(
-        "w-full h-full min-h-[48px] rounded-xl border p-0 flex items-center justify-center transition-all duration-200 shadow-sm text-base font-semibold",
+        "w-full h-full min-h-[48px] rounded-lg border p-0 flex items-center justify-center transition-all duration-200 shadow-sm text-base font-semibold",
         statusBase,
         !disabled && statusHover,
         !disabled && "hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
