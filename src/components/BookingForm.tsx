@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookingRequest, DateSlot } from '@/types/booking';
 import { cn } from '@/lib/utils';
+import CountrySelect from '@/components/CountrySelect';
 
 interface BookingFormProps {
   selectedDate: string | null;
@@ -177,8 +178,9 @@ export function BookingForm({ selectedDate, selectedSlot, onSubmit, loading }: B
               defaultCountry="XK"
               value={phone}
               onChange={setPhone}
+              countrySelectComponent={CountrySelect}
               countrySelectProps={{
-                className: "booking-country-select rounded-md border border-input bg-transparent px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60"
+                className: "min-w-[170px]"
               }}
               className="flex w-full items-center gap-2 rounded-lg border border-input bg-background pl-10 pr-3 py-2 focus-within:ring-2 focus-within:ring-primary/60 focus-within:border-primary/60"
               inputClassName="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"

@@ -164,38 +164,3 @@
     opacity: 0.7;
   }
 }
-
-@layer components {
-  .booking-country-select {
-    @apply absolute inset-0 h-full w-full cursor-pointer opacity-0;
-    background-color: transparent;
-  }
-
-  .booking-country-select:focus {
-    background-color: hsl(var(--card));
-    box-shadow: var(--shadow-lg);
-    border-radius: var(--radius);
-  }
-
-  .booking-country-select:focus-visible {
-    outline: none;
-  }
-
-  .booking-country-select option,
-  .booking-country-select optgroup {
-    @apply bg-card text-foreground text-sm;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: calc(var(--radius) - 2px);
-  }
-
-  .booking-country-select option:hover,
-  .booking-country-select option:focus,
-  .booking-country-select option:checked {
-    @apply bg-accent text-accent-foreground;
-  }
-
-  .booking-country-select::-ms-expand {
-    display: none;
-  }
-}
